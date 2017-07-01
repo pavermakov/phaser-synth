@@ -1,0 +1,40 @@
+* {
+		-webkit-touch-callout: none;
+		-webkit-text-size-adjust: none;
+		-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+		-webkit-user-select: none;
+		user-select: none;
+	}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	background-color: white;
+}
+
+#content canvas {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	-webkit-transform: translate(-50%, -50%);
+}
+
+.preloader {
+	position: absolute;
+	overflow: hidden;
+}
+	.preloader__back,
+	.preloader__front {
+		height: 8px;
+		border-radius: 100px;
+	}
+	.preloader__back {
+		background-color: rgba(216, 216, 216, 0.2);
+	}
+	.preloader__front {
+		width: 0;
+		background-color: rgb(121, 175, 26);
+	}

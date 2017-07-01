@@ -1,0 +1,22 @@
+{
+  "extends": "airbnb-base",
+  "rules": {
+    "max-len": ["error", {
+      "code": 120,
+      "tabWidth": 2,
+      "ignoreUrls": true
+    }],
+		"indent": ["error", "tab"],
+		"no-underscore-dangle": "off",
+		"no-shadow": "off",
+		"camelcase": "off",
+		"no-param-reassign": "off",
+		"no-nested-ternary": "off",
+  },
+	"globals": {
+    "document": true,
+    "window": true,
+		"jQuery": true,
+		"navigator": true
+  }
+}
