@@ -20,6 +20,7 @@ export default class extends Phaser.State {
 		let i = null;
 
 		const options = {
+			id: null,
 			x: null,
 			y: 0,
 			width: this.world.width / totalKeys,
@@ -30,11 +31,23 @@ export default class extends Phaser.State {
 		for (i = 0; i < totalKeys; i += 1) {
 			options.x = 40 * i;
 			options.color = keyColors[i];
+			options.id = i + 1;
 
 			tempKey = new Key(this.game, options);
+
+			this._addSynthKeySignals(tempKey);
 			keys.add(tempKey);
 		}
 
 		return keys;
+	}
+
+	_addSynthKeySignals(key) {
+		const { tapSignal } = key.getSignals();
+		tapSignal.add(this._processTap, this);
+	}
+
+	_processTap(id) {
+		console.log(`You tapped a key with id ${id}`);
 	}
 }
