@@ -12,6 +12,7 @@ export default class extends Graphics {
 		this.game = game;
 
 		this._addData(options)
+				._addSound()
 				._addSignals()
 				._addEvents()
 				._draw(options);
@@ -23,7 +24,14 @@ export default class extends Graphics {
 		this.data = {
 			id,
 			signals: {},
+			sound: null,
 		};
+
+		return this;
+	}
+
+	_addSound() {
+		this.data.sound = this.game.add.audio(`key-${this.data.id}`, 1, false);
 
 		return this;
 	}
@@ -49,9 +57,10 @@ export default class extends Graphics {
 	}
 
 	_handleTap() {
-		const { id, signals } = this.data;
+		const { id, signals, sound } = this.data;
 
 		signals.tapSignal.dispatch(id);
+		sound.play();
 	}
 
 	toggleInput(isEnabled) {

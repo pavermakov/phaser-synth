@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import WebFont from 'webfontloader';
+import config from '../../config/';
+import settings from './settings';
 import utils from '../../utils/';
 
 export default class extends Phaser.State {
@@ -12,12 +14,29 @@ export default class extends Phaser.State {
 	}
 
 	preload() {
-		this._removePreloadBar();
-		utils.switchState(this, 'Play');
+		this._loadAssets();
+
+		this.load.onFileComplete.add(this._updatePreloadBar, this);
+		this.load.onLoadComplete.addOnce(this._finishAssets, this);
+	}
+
+	_loadAssets() {
+		const { paths } = config;
+		const { sounds } = settings;
+
+		let i = null;
+		let key = null;
+
+		// loading sounds
+		for (i = 0; i < sounds.length; i += 1) {
+			key = sounds[i];
+			this.load.audio(key, [`${paths.sounds}${key}.mp3`, `${paths.sounds}${key}.ogg`]);
+		}
 	}
 
 	_initPreloadBar() {
 		this.$preloadBar = jQuery('.preloader');
+		this.$preloadLevel = this.$preloadBar.find('.preloader__front');
 		const $content = jQuery('#content');
 
 		const props = {
@@ -36,5 +55,21 @@ export default class extends Phaser.State {
 
 	_removePreloadBar() {
 		this.$preloadBar.remove();
+	}
+
+	_updatePreloadBar(progress) {
+		this.$preloadLevel.css('width', `${progress}%`);
+	}
+
+	_finishAssets() {
+		this.assetsReady = true;
+
+		// temporarily
+		this._completeLoading();
+	}
+
+	_completeLoading() {
+		this._removePreloadBar();
+		utils.switchState(this, 'Play');
 	}
 }
