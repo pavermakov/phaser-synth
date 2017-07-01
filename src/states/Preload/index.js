@@ -12,11 +12,12 @@ export default class extends Phaser.State {
 	}
 
 	preload() {
+		this._removePreloadBar();
 		utils.switchState(this, 'Play');
 	}
 
 	_initPreloadBar() {
-		const $preloadBar = jQuery('.preloader');
+		this.$preloadBar = jQuery('.preloader');
 		const $content = jQuery('#content');
 
 		const props = {
@@ -24,12 +25,16 @@ export default class extends Phaser.State {
 			width: Math.ceil($content.width() * 0.6),
 		};
 
-		$preloadBar.css({
+		this.$preloadBar.css({
 			top: `${props.y}px`,
 			left: '50%',
 			width: `${props.width}px`,
 			transform: 'translate(-50%)',
 			'-webkit-transform': 'translate(-50%)',
 		});
+	}
+
+	_removePreloadBar() {
+		this.$preloadBar.remove();
 	}
 }
