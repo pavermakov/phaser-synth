@@ -10,10 +10,12 @@ export default class extends Phaser.State {
 
 	create() {
 		this.synthKeys = this._createKeys();
+
+		this._playSequence();
 	}
 
 	_createKeys() {
-		const keys = this.game.add.group();
+		const keys = [];
 		const { totalKeys, keyColors } = this.Store;
 
 		let tempKey = null;
@@ -29,14 +31,14 @@ export default class extends Phaser.State {
 		};
 
 		for (i = 0; i < totalKeys; i += 1) {
-			options.x = 40 * i;
+			options.x = options.width * i;
 			options.color = keyColors[i];
 			options.id = i + 1;
 
 			tempKey = new Key(this.game, options);
 
 			this._addSynthKeySignals(tempKey);
-			keys.add(tempKey);
+			keys.push(tempKey);
 		}
 
 		return keys;
@@ -49,5 +51,21 @@ export default class extends Phaser.State {
 
 	_processTap(id) {
 		console.log(`You tapped a key with id ${id}`);
+	}
+
+	_playSequence() {
+		const { sequence } = this.Store;
+		const interval = 200;
+		let i = null;
+
+		// turn off key input
+
+		for (i = 0; i < sequence.length; i += 1) {
+			setTimeout(this._activateSynthKey.bind(this, sequence, i), interval * i);
+		}
+	}
+
+	_activateSynthKey(sequence, i) {
+		this.synthKeys[sequence[i] - 1].activate(true);
 	}
 }

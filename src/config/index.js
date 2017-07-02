@@ -11,7 +11,7 @@ const config = {
 	antialias: true,
 	api: {
 		google: {
-			shortUrlKey: 'AIzaSyDMoGLmBh3yVbae-ezA5Hp1ubVkSCIL7vU',
+			shortUrlKey: '',
 		},
 	},
 	shareUrl: '',
@@ -23,8 +23,5 @@ const config = {
 		spritesheets: 'assets/spritesheets/',
 	},
 };
-
-config.size.width = Math.ceil(config.size.width * window.devicePixelRatio);
-config.size.height = Math.ceil(config.size.height * window.devicePixelRatio);
 
 export default config;

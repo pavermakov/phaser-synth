@@ -17,6 +17,8 @@ class Store {
 	_initData() {
 		this.totalKeys = 4;
 		this.keyColors = [0x421964, 0x18D5EE, 0xBA1D50, 0xB7A4CC];
+
+		this.sequence = [1, 2, 3, 4];
 	}
 }
 
