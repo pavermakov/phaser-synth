@@ -3,7 +3,6 @@ import Phaser from 'phaser';
 const settings = {
 	transparent: true,
 	maxPointers: 2,
-	clearBeforeRender: false,
 	roundPixels: true,
 	forceSingleUpdate: false, // необходимо проверить на fps, и лишь потом сделать вывод
 	disableVisibilityChange: true,

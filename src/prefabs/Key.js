@@ -11,20 +11,30 @@ export default class extends Graphics {
 	_init(game, options) {
 		this.game = game;
 
-		this._addData(options)
+		this._draw(options)
+				._addData(options)
 				._addSound()
 				._addSignals()
-				._addEvents()
-				._draw(options);
+				._addEvents();
 
 		this.game.add.existing(this);
 	}
 
-	_addData({ id }) {
+	_draw({ width, height, color }) {
+		this.beginFill(color);
+		this.drawRect(0, 0, width, height);
+		this.endFill();
+
+		return this;
+	}
+
+	_addData({ id, color }) {
 		this.data = {
 			id,
+			color,
 			signals: {},
 			sound: null,
+			tweens: {},
 		};
 
 		return this;
@@ -43,28 +53,52 @@ export default class extends Graphics {
 	}
 
 	_addEvents() {
-		this.events.onInputDown.add(this._handleTap, this);
+		this.events.onInputDown.add(this._handleInputDown, this);
+		this.events.onInputUp.add(this._handleInputUp, this);
 
 		return this;
 	}
 
-	_draw({ x, y, width, height, color }) {
-		this.beginFill(color);
-		this.drawRect(x, y, width, height);
-		this.endFill();
-
-		return this;
-	}
-
-	_handleTap() {
-		const { id, signals, sound } = this.data;
+	_handleInputDown() {
+		const { id, signals } = this.data;
 
 		signals.tapSignal.dispatch(id);
-		sound.play();
+
+		this.activate();
+	}
+
+	_handleInputUp() {
+		this._changeAlpha(1);
+	}
+
+	activate(isMachine) {
+		this._playSound()
+				._changeAlpha(0.7)
+				._animate();
+
+		if (isMachine) {
+			setTimeout(this._changeAlpha.bind(this, 1), 130);
+		}
 	}
 
 	toggleInput(isEnabled) {
 		this.enabled = isEnabled;
+
+		return this;
+	}
+
+	_animate() {
+		return this;
+	}
+
+	_changeAlpha(alpha) {
+		this.alpha = alpha;
+
+		return this;
+	}
+
+	_playSound() {
+		this.data.sound.play();
 
 		return this;
 	}
