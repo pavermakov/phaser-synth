@@ -1,3 +1,5 @@
+import Phaser from 'phaser';
+
 class Store {
 	constructor(game) {
 		this.game = game;
@@ -6,19 +8,72 @@ class Store {
 	}
 
 	init() {
-		this._initStates();
-		this._initData();
+		this.initData()
+				.initSignals();
 	}
 
-	_initStates() {
+	initData() {
 		this.states = this.game.state.states;
-	}
 
-	_initData() {
+		this.score = 0;
 		this.totalKeys = 4;
 		this.keyColors = [0x421964, 0x18D5EE, 0xBA1D50, 0xB7A4CC];
 
-		this.sequence = [1, 2, 3, 4];
+		this.sequence = [];
+		this.playerSequence = [];
+		this.sequenceInterval = 400;
+
+		this.signals = {
+			onNewKeyPushed: new Phaser.Signal(),
+			onNewPlayerKeyPushed: new Phaser.Signal(),
+			onScoreIncreased: new Phaser.Signal(),
+		};
+
+		return this;
+	}
+
+	initSignals() {
+		this.states.Play.onStateReady.add(this.fetchPlayStateSignals, this);
+
+		return this;
+	}
+
+	fetchPlayStateSignals(state) {
+		const { onNewKey, onNewPlayerKey, onPlayerError, onPlayerSuccess } = state.getSignals();
+
+		onNewKey.add(this.addKeyToSequence, this);
+		onNewPlayerKey.add(this.addKeyToPlayerSequence, this);
+		onPlayerError.add(this.clearPlayerSequence, this);
+		onPlayerSuccess.add(this.clearPlayerSequence, this);
+	}
+
+	addKeyToSequence(key) {
+		this.sequence.push(key);
+		this.signals.onNewKeyPushed.dispatch();
+	}
+
+	addKeyToPlayerSequence(key) {
+		this.playerSequence.push(key);
+
+		this.signals.onNewPlayerKeyPushed.dispatch();
+	}
+
+	increaseScore() {
+		this.score += 1;
+
+		this.signals.onScoreIncreased.dispatch(this.score);
+	}
+
+	clearPlayerSequence() {
+		this.playerSequence.length = 0;
+	}
+
+	execute(methods) {
+		methods.forEach(method => method.call(), this);
+	}
+
+	getSignals() {
+		return this.signals;
 	}
 }
 

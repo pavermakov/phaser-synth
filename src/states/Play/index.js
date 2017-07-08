@@ -1,17 +1,49 @@
 import Phaser from 'phaser';
 import Key from '../../prefabs/Key';
+import utils from '../../utils/';
 
 export default class extends Phaser.State {
 	init() {
 		this.Store = window.game.Store;
 		this.game = this.Store.game;
 		this.world = this.game.world;
+
+		this.initData();
+		this.initSignals();
 	}
 
 	create() {
 		this.synthKeys = this._createKeys();
 
-		this._playSequence();
+		this.start();
+	}
+
+	initData() {
+		this.data = {
+			signals: {
+				onNewKey: new Phaser.Signal(),
+				onNewPlayerKey: new Phaser.Signal(),
+				onPlayerError: new Phaser.Signal(),
+				onPlayerSuccess: new Phaser.Signal(),
+			},
+		};
+
+		return this;
+	}
+
+	initSignals() {
+		const { onNewKeyPushed, onNewPlayerKeyPushed } = this.Store.getSignals();
+
+		onNewKeyPushed.add(this.playSequence, this);
+		onNewPlayerKeyPushed.add(this.compareSequence, this);
+
+		return this;
+	}
+
+	start() {
+		this.onStateReady.dispatch(this);
+
+		this.addNewKey();
 	}
 
 	_createKeys() {
@@ -46,26 +78,82 @@ export default class extends Phaser.State {
 
 	_addSynthKeySignals(key) {
 		const { tapSignal } = key.getSignals();
-		tapSignal.add(this._processTap, this);
+		tapSignal.add(this.processTap, this);
 	}
 
-	_processTap(id) {
-		console.log(`You tapped a key with id ${id}`);
+	processTap(id) {
+
+		this.data.signals.onNewPlayerKey.dispatch(id);
 	}
 
-	_playSequence() {
-		const { sequence } = this.Store;
-		const interval = 200;
+	playSequence() {
+		const { sequence, sequenceInterval } = this.Store;
 		let i = null;
 
-		// turn off key input
+		this.toggleKeys(false);
 
 		for (i = 0; i < sequence.length; i += 1) {
-			setTimeout(this._activateSynthKey.bind(this, sequence, i), interval * i);
+			if (i < sequence.length) {
+				setTimeout(this.activateSynthKey.bind(this, sequence, i), sequenceInterval * i);
+			}
 		}
 	}
 
-	_activateSynthKey(sequence, i) {
+	activateSynthKey(sequence, i) {
+		// refactor through signals
 		this.synthKeys[sequence[i] - 1].activate(true);
+
+		if (i === sequence.length - 1) {
+			this.toggleKeys(true);
+		}
+	}
+
+	addNewKey() {
+		const key = this.game.rnd.integerInRange(1, this.Store.totalKeys);
+		this.data.signals.onNewKey.dispatch(key);
+
+		return this;
+	}
+
+	toggleKeys(isEnabled) {
+		let i = null;
+
+		for (i = 0; i < this.synthKeys.length; i += 1) {
+			this.synthKeys[i].toggleInput(isEnabled);
+		}
+	}
+
+	compareSequence() {
+		const { sequence, playerSequence } = this.Store;
+		const lastIndex = playerSequence.length - 1;
+
+		if (playerSequence[lastIndex] === sequence[lastIndex]) {
+			this.handlePlayerSuccess();
+		} else {
+			this.handlePlayerError();
+		}
+
+		return this;
+	}
+
+	handlePlayerSuccess() {
+		// check if it is the end of the sequence
+		if (this.Store.sequence.length === this.Store.playerSequence.length) {
+			this.data.signals.onPlayerSuccess.dispatch();
+			setTimeout(this.addNewKey.bind(this), 1000);
+		}
+	}
+
+	handlePlayerError() {
+		this.data.signals.onPlayerError.dispatch();
+
+		this.toggleKeys(false);
+
+		utils.shakeCamera(this.game, 0.03, 200, true, Phaser.Camera.SHAKE_HORIZONTAL);
+		setTimeout(this.playSequence.bind(this), 1000);
+	}
+
+	getSignals() {
+		return this.data.signals;
 	}
 }

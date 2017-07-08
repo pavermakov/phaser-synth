@@ -20,7 +20,11 @@ class Game extends Phaser.Game {
 	}
 
 	_addState({ key, state }) {
-		this.state.add(key, state);
+		const newState = this.state.add(key, state);
+
+		if (!newState.onStateReady) {
+			newState.onStateReady = new Phaser.Signal();
+		}
 	}
 
 	_nextState() {
