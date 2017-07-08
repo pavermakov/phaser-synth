@@ -82,7 +82,7 @@ export default class extends Graphics {
 	}
 
 	toggleInput(isEnabled) {
-		this.enabled = isEnabled;
+		this.input.enabled = isEnabled;
 
 		return this;
 	}
