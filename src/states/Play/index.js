@@ -13,7 +13,7 @@ export default class extends Phaser.State {
 	}
 
 	create() {
-		this.synthKeys = this._createKeys();
+		this.synthKeys = this.createKeys();
 
 		this.start();
 	}
@@ -23,6 +23,9 @@ export default class extends Phaser.State {
 			signals: {
 				onNewKey: new Phaser.Signal(),
 				onNewPlayerKey: new Phaser.Signal(),
+				onKeyDisable: new Phaser.Signal(),
+				onKeyEnable: new Phaser.Signal(),
+				onKeyActive: new Phaser.Signal(),
 				onPlayerError: new Phaser.Signal(),
 				onPlayerSuccess: new Phaser.Signal(),
 			},
@@ -46,7 +49,7 @@ export default class extends Phaser.State {
 		this.addNewKey();
 	}
 
-	_createKeys() {
+	createKeys() {
 		const keys = [];
 		const { totalKeys, keyColors } = this.Store;
 
@@ -69,20 +72,21 @@ export default class extends Phaser.State {
 
 			tempKey = new Key(this.game, options);
 
-			this._addSynthKeySignals(tempKey);
+			this.initSynthKeySignals(tempKey);
 			keys.push(tempKey);
 		}
 
 		return keys;
 	}
 
-	_addSynthKeySignals(key) {
-		const { tapSignal } = key.getSignals();
-		tapSignal.add(this.processTap, this);
+	initSynthKeySignals(key) {
+		const { onKeyTapped } = key.getSignals();
+		onKeyTapped.add(this.processTap, this);
+
+		return this;
 	}
 
 	processTap(id) {
-
 		this.data.signals.onNewPlayerKey.dispatch(id);
 	}
 
@@ -90,7 +94,7 @@ export default class extends Phaser.State {
 		const { sequence, sequenceInterval } = this.Store;
 		let i = null;
 
-		this.toggleKeys(false);
+		this.data.signals.onKeyDisable.dispatch();
 
 		for (i = 0; i < sequence.length; i += 1) {
 			if (i < sequence.length) {
@@ -100,11 +104,10 @@ export default class extends Phaser.State {
 	}
 
 	activateSynthKey(sequence, i) {
-		// refactor through signals
-		this.synthKeys[sequence[i] - 1].activate(true);
+		this.data.signals.onKeyActive.dispatch(sequence[i], true);
 
 		if (i === sequence.length - 1) {
-			this.toggleKeys(true);
+			this.data.signals.onKeyEnable.dispatch();
 		}
 	}
 
@@ -113,14 +116,6 @@ export default class extends Phaser.State {
 		this.data.signals.onNewKey.dispatch(key);
 
 		return this;
-	}
-
-	toggleKeys(isEnabled) {
-		let i = null;
-
-		for (i = 0; i < this.synthKeys.length; i += 1) {
-			this.synthKeys[i].toggleInput(isEnabled);
-		}
 	}
 
 	compareSequence() {
@@ -137,19 +132,19 @@ export default class extends Phaser.State {
 	}
 
 	handlePlayerSuccess() {
-		// check if it is the end of the sequence
 		if (this.Store.sequence.length === this.Store.playerSequence.length) {
 			this.data.signals.onPlayerSuccess.dispatch();
+			this.data.signals.onKeyDisable.dispatch();
+
 			setTimeout(this.addNewKey.bind(this), 1000);
 		}
 	}
 
 	handlePlayerError() {
 		this.data.signals.onPlayerError.dispatch();
-
-		this.toggleKeys(false);
-
+		this.data.signals.onKeyDisable.dispatch();
 		utils.shakeCamera(this.game, 0.03, 200, true, Phaser.Camera.SHAKE_HORIZONTAL);
+
 		setTimeout(this.playSequence.bind(this), 1000);
 	}
 
