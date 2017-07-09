@@ -22,6 +22,7 @@ class Store {
 		this.sequence = [];
 		this.playerSequence = [];
 		this.sequenceInterval = 400;
+		this.sequenceIntervalStep = 25;
 
 		this.signals = {
 			onNewKeyPushed: new Phaser.Signal(),
@@ -39,12 +40,19 @@ class Store {
 	}
 
 	fetchPlayStateSignals(state) {
-		const { onNewKey, onNewPlayerKey, onPlayerError, onPlayerSuccess } = state.getSignals();
+		const {
+			onNewKey,
+			onNewPlayerKey,
+			onPlayerError,
+			onPlayerSuccess,
+			onLevelUp,
+		} = state.getSignals();
 
 		onNewKey.add(this.addKeyToSequence, this);
 		onNewPlayerKey.add(this.addKeyToPlayerSequence, this);
 		onPlayerError.add(this.clearPlayerSequence, this);
 		onPlayerSuccess.add(this.clearPlayerSequence, this);
+		onLevelUp.add(this.descreaseInterval, this);
 	}
 
 	addKeyToSequence(key) {
@@ -64,12 +72,12 @@ class Store {
 		this.signals.onScoreIncreased.dispatch(this.score);
 	}
 
-	clearPlayerSequence() {
-		this.playerSequence.length = 0;
+	descreaseInterval() {
+		this.sequenceInterval -= this.sequenceIntervalStep;
 	}
 
-	execute(methods) {
-		methods.forEach(method => method.call(), this);
+	clearPlayerSequence() {
+		this.playerSequence.length = 0;
 	}
 
 	getSignals() {

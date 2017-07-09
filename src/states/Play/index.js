@@ -28,6 +28,7 @@ export default class extends Phaser.State {
 				onKeyActive: new Phaser.Signal(),
 				onPlayerError: new Phaser.Signal(),
 				onPlayerSuccess: new Phaser.Signal(),
+				onLevelUp: new Phaser.Signal(),
 			},
 		};
 
@@ -135,6 +136,7 @@ export default class extends Phaser.State {
 		if (this.Store.sequence.length === this.Store.playerSequence.length) {
 			this.data.signals.onPlayerSuccess.dispatch();
 			this.data.signals.onKeyDisable.dispatch();
+			this.data.signals.onLevelUp.dispatch();
 
 			setTimeout(this.addNewKey.bind(this), 1000);
 		}
