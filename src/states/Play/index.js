@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import Key from '../../prefabs/Key';
+import UI from '../../prefabs/UI';
 import utils from '../../utils/';
 
 export default class extends Phaser.State {
@@ -14,6 +15,7 @@ export default class extends Phaser.State {
 
 	create() {
 		this.synthKeys = this.createKeys();
+		this.UI = new UI(this.game);
 
 		this.start();
 	}
@@ -64,6 +66,7 @@ export default class extends Phaser.State {
 			width: this.world.width / totalKeys,
 			height: this.world.height,
 			color: null,
+			inputEnabled: true,
 		};
 
 		for (i = 0; i < totalKeys; i += 1) {
