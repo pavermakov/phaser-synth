@@ -1,20 +1,25 @@
 import Phaser from 'phaser';
 import Plank from './Plank';
+import Life from './Life';
 
 class UI {
 	constructor(game) {
 		this.game = game;
+		this.Store = window.game.Store; // TODO: refactor
 
 		this.init();
 	}
 
 	init() {
-		this.initPlanks();
+		this.initPlanks()
+				.initLives();
+
+				console.log(this.lives)
 	}
 
 	initPlanks() {
 		this.plankColor = 0x0F0909;
-		this.separatorColor = 0xff5beb;
+		this.separatorColor = 0xC74343;
 		this.plankHeight = 50;
 		this.separatorWidth = 5;
 
@@ -56,6 +61,40 @@ class UI {
 		this.bottomPlank.bottom = this.game.height + this.separatorWidth;
 
 		return this;
+	}
+
+	initLives() {
+		const { totalLives } = this.Store;
+		const gap = 40;
+		let life = null;
+		let i = null;
+
+		this.lives = this.game.add.group();
+
+		const options = {
+			id: null,
+			x: null,
+			y: this.bottomPlank.centerY,
+			key: 'heart',
+			anchor: {
+				x: 0.5,
+				y: 0.5,
+			},
+			scale: {
+				x: 0.5,
+				y: 0.5,
+			},
+		};
+
+		for (i = 0; i < totalLives; i += 1) {
+			options.id = i;
+			options.x = i * gap;
+
+			life = new Life(this.game, options);
+			this.lives.add(life);
+		}
+
+		this.lives.centerX = this.game.world.centerX;
 	}
 }
 

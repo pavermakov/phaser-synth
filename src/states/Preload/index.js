@@ -22,10 +22,16 @@ export default class extends Phaser.State {
 
 	_loadAssets() {
 		const { paths } = config;
-		const { sounds } = settings;
+		const { images, sounds } = settings;
 
 		let i = null;
 		let key = null;
+
+		// loading images
+		for (i = 0; i < images.length; i += 1) {
+			key = images[i];
+			this.load.image(key, `${paths.images}${key}.png`);
+		}
 
 		// loading sounds
 		for (i = 0; i < sounds.length; i += 1) {
