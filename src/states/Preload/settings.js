@@ -1,4 +1,7 @@
 const assets = {
+	images: [
+		'heart',
+	],
 	sounds: [
 		'key-1',
 		'key-2',

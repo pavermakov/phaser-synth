@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
 
-export default class extends Phaser.Graphics {
-	constructor(game, { x, y, inputEnabled, anchor, scale }) {
-		super(game, x, y);
+export default class extends Phaser.Sprite {
+	constructor(game, { x, y, key, inputEnabled, anchor, scale }) {
+		super(game, x, y, key);
 
 		this.inputEnabled = inputEnabled || true;
 
