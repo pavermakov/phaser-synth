@@ -13,7 +13,8 @@ class UI {
 
 	init() {
 		this.initPlanks()
-				.initLives();
+				.initLives()
+				.initSignals();
 	}
 
 	initPlanks() {
@@ -93,7 +94,23 @@ class UI {
 			this.lives.add(life);
 		}
 
-		this.lives.centerX = this.game.world.centerX;
+		this.lives.centerX = this.game.world.width * 0.3333;
+
+		return this;
+	}
+
+	initSignals() {
+		const { onLivesDecreased } = this.store.getSignals();
+
+		onLivesDecreased.add(this.removeLife, this);
+
+		return this;
+	}
+
+	removeLife() {
+		if (this.lives.length <= 0) return;
+
+		this.lives.getAt(this.lives.length - 1).destroy();
 	}
 }
 

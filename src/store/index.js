@@ -28,6 +28,8 @@ class Store {
 			onNewKeyPushed: new Phaser.Signal(),
 			onNewPlayerKeyPushed: new Phaser.Signal(),
 			onScoreIncreased: new Phaser.Signal(),
+			onLivesDecreased: new Phaser.Signal(),
+			onOutOfLives: new Phaser.Signal(),
 		};
 
 		return this;
@@ -50,9 +52,19 @@ class Store {
 
 		onNewKey.add(this.addKeyToSequence, this);
 		onNewPlayerKey.add(this.addKeyToPlayerSequence, this);
-		onPlayerError.add(this.clearPlayerSequence, this);
+		onPlayerError.add(this.handlePlayerError, this);
 		onPlayerSuccess.add(this.clearPlayerSequence, this);
 		onLevelUp.add(this.descreaseInterval, this);
+	}
+
+	handlePlayerError() {
+		this.clearPlayerSequence();
+
+		if (this.totalLives > 0) {
+			this.descreaseLives();
+		} else {
+			this.signals.onOutOfLives.dispatch();
+		}
 	}
 
 	addKeyToSequence(key) {
@@ -62,14 +74,17 @@ class Store {
 
 	addKeyToPlayerSequence(key) {
 		this.playerSequence.push(key);
-
 		this.signals.onNewPlayerKeyPushed.dispatch();
 	}
 
 	increaseScore() {
 		this.score += 1;
-
 		this.signals.onScoreIncreased.dispatch(this.score);
+	}
+
+	descreaseLives() {
+		this.totalLives -= 1;
+		this.signals.onLivesDecreased.dispatch();
 	}
 
 	descreaseInterval() {
