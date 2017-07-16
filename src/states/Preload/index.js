@@ -10,17 +10,18 @@ export default class extends Phaser.State {
 		this.assetsReady = false;
 		this.apiReady = false;
 
-		this._initPreloadBar();
+		this.initPreloadBar();
 	}
 
 	preload() {
-		this._loadAssets();
+		this.loadAssets()
+				.loadFonts();
 
-		this.load.onFileComplete.add(this._updatePreloadBar, this);
-		this.load.onLoadComplete.addOnce(this._finishAssets, this);
+		this.load.onFileComplete.add(this.updatePreloadBar, this);
+		this.load.onLoadComplete.addOnce(this.finishAssets, this);
 	}
 
-	_loadAssets() {
+	loadAssets() {
 		const { paths } = config;
 		const { images, sounds } = settings;
 
@@ -38,9 +39,22 @@ export default class extends Phaser.State {
 			key = sounds[i];
 			this.load.audio(key, [`${paths.sounds}${key}.mp3`, `${paths.sounds}${key}.ogg`]);
 		}
+
+		return this;
 	}
 
-	_initPreloadBar() {
+	loadFonts() {
+		WebFont.load({
+			google: {
+				families: ['Quicksand'],
+			},
+			active: this.finishFonts.bind(this),
+		});
+
+		return this;
+	}
+
+	initPreloadBar() {
 		this.$preloadBar = jQuery('.preloader');
 		this.$preloadLevel = this.$preloadBar.find('.preloader__front');
 		const $content = jQuery('#content');
@@ -59,23 +73,32 @@ export default class extends Phaser.State {
 		});
 	}
 
-	_removePreloadBar() {
+	removePreloadBar() {
 		this.$preloadBar.remove();
 	}
 
-	_updatePreloadBar(progress) {
+	updatePreloadBar(progress) {
 		this.$preloadLevel.css('width', `${progress}%`);
 	}
 
-	_finishAssets() {
+	finishAssets() {
 		this.assetsReady = true;
-
-		// temporarily
-		this._completeLoading();
+		this.checkLoadingState();
 	}
 
-	_completeLoading() {
-		this._removePreloadBar();
+	finishFonts() {
+		this.fontsReady = true;
+		this.checkLoadingState();
+	}
+
+	checkLoadingState() {
+		if (this.assetsReady && this.fontsReady) {
+			this.completeLoading();
+		}
+	}
+
+	completeLoading() {
+		this.removePreloadBar();
 		utils.switchState(this, 'Play');
 	}
 }

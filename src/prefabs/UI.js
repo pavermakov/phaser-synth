@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import Plank from './Plank';
 import Life from './Life';
+import ScoreText from './ScoreText';
 import { store } from '../store/';
 
 class UI {
@@ -12,9 +13,20 @@ class UI {
 	}
 
 	init() {
-		this.initPlanks()
+		this.initData()
+				.initPlanks()
 				.initLives()
+				.initScoreText()
 				.initSignals();
+	}
+
+	initData() {
+		this.data = {
+			padding: 20,
+			scoreTextTemplate: 'SCORE:',
+		};
+
+		return this;
 	}
 
 	initPlanks() {
@@ -77,7 +89,7 @@ class UI {
 			y: this.bottomPlank.centerY,
 			key: 'heart',
 			anchor: {
-				x: 0.5,
+				x: 0,
 				y: 0.5,
 			},
 			scale: {
@@ -88,23 +100,46 @@ class UI {
 
 		for (i = 0; i < totalLives; i += 1) {
 			options.id = i;
-			options.x = i * gap;
+			options.x = (i * gap) + this.data.padding;
 
 			life = new Life(this.game, options);
 			this.lives.add(life);
 		}
 
-		this.lives.centerX = this.game.world.width * 0.3333;
+		return this;
+	}
+
+	initScoreText() {
+		const options = {
+			x: this.game.width - this.data.padding,
+			y: this.bottomPlank.centerY,
+			text: `${this.data.scoreTextTemplate} ${this.store.score}`,
+			style: {
+				font: 'bold 20px Quicksand',
+				fill: 'white',
+			},
+			anchor: {
+				x: 1,
+				y: 0.5,
+			},
+		};
+
+		this.scoreText = new ScoreText(this.game, options);
 
 		return this;
 	}
 
 	initSignals() {
-		const { onLivesDecreased } = this.store.getSignals();
+		const { onLivesDecreased, onScoreIncreased } = this.store.getSignals();
 
 		onLivesDecreased.add(this.removeLife, this);
+		onScoreIncreased.add(this.updateScoreText, this);
 
 		return this;
+	}
+
+	updateScoreText(score) {
+		this.scoreText.setText(`${this.data.scoreTextTemplate} ${score}`);
 	}
 
 	removeLife() {

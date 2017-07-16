@@ -53,8 +53,13 @@ class Store {
 		onNewKey.add(this.addKeyToSequence, this);
 		onNewPlayerKey.add(this.addKeyToPlayerSequence, this);
 		onPlayerError.add(this.handlePlayerError, this);
-		onPlayerSuccess.add(this.clearPlayerSequence, this);
+		onPlayerSuccess.add(this.handlePlayerSuccess, this);
 		onLevelUp.add(this.descreaseInterval, this);
+	}
+
+	handlePlayerSuccess() {
+		this.clearPlayerSequence();
+		this.increaseScore();
 	}
 
 	handlePlayerError() {
