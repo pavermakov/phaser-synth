@@ -1,11 +1,12 @@
 import Phaser from 'phaser';
 import Plank from './Plank';
 import Life from './Life';
+import { store } from '../store/';
 
 class UI {
 	constructor(game) {
 		this.game = game;
-		this.Store = window.game.Store; // TODO: refactor
+		this.store = store;
 
 		this.init();
 	}
@@ -13,8 +14,6 @@ class UI {
 	init() {
 		this.initPlanks()
 				.initLives();
-
-				console.log(this.lives)
 	}
 
 	initPlanks() {
@@ -64,7 +63,7 @@ class UI {
 	}
 
 	initLives() {
-		const { totalLives } = this.Store;
+		const { totalLives } = this.store;
 		const gap = 40;
 		let life = null;
 		let i = null;

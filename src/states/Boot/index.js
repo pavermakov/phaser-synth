@@ -1,31 +1,30 @@
 import Phaser from 'phaser';
-import Store from '../../store/';
+import * as store from '../../store/';
 import config from '../../config/';
 import utils from '../../utils/';
 import settings from './settings';
 
 export default class extends Phaser.State {
 	init() {
-		this._initStore();
+		this.initData();
 		this._initSettings();
 		this._stretchCanvas();
 	}
 
 	preload() {
-		const { paths, resolution } = config;
+		const { paths } = config;
 
 		this.load.image('loading', `${paths.images}loading.png`);
-
 		this.load.onLoadComplete.addOnce(this._finishAssets, this);
 	}
 
-	_initStore() {
-		window.game.Store = new Store(window.game);
-		this.Store = window.game.Store;
+	initData() {
+		this.game = window.game;
+		this.store = store.init();
 	}
 
 	_initSettings() {
-		const game = this.Store.game;
+		const game = this.game;
 		const paths = [
 			game,
 			game.input,

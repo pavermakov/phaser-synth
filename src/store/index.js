@@ -1,9 +1,8 @@
 import Phaser from 'phaser';
 
 class Store {
-	constructor(game) {
-		this.game = game;
-
+	constructor() {
+		this.game = window.game;
 		this.init();
 	}
 
@@ -86,4 +85,9 @@ class Store {
 	}
 }
 
-export default Store;
+export let store = null;
+
+export const init = () => {
+	store = new Store();
+	return store;
+};
