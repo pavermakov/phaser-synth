@@ -1,12 +1,13 @@
 import Phaser from 'phaser';
 import Key from '../../prefabs/Key';
 import UI from '../../prefabs/UI';
+import { store } from '../../store/';
 import utils from '../../utils/';
 
 export default class extends Phaser.State {
 	init() {
-		this.Store = window.game.Store;
-		this.game = this.Store.game;
+		this.store = store;
+		this.game = this.store.game;
 		this.world = this.game.world;
 
 		this.initData();
@@ -38,7 +39,7 @@ export default class extends Phaser.State {
 	}
 
 	initSignals() {
-		const { onNewKeyPushed, onNewPlayerKeyPushed } = this.Store.getSignals();
+		const { onNewKeyPushed, onNewPlayerKeyPushed } = this.store.getSignals();
 
 		onNewKeyPushed.add(this.playSequence, this);
 		onNewPlayerKeyPushed.add(this.compareSequence, this);
@@ -54,7 +55,7 @@ export default class extends Phaser.State {
 
 	createKeys() {
 		const keys = [];
-		const { totalKeys, keyColors } = this.Store;
+		const { totalKeys, keyColors } = this.store;
 
 		let tempKey = null;
 		let i = null;
@@ -95,7 +96,7 @@ export default class extends Phaser.State {
 	}
 
 	playSequence() {
-		const { sequence, sequenceInterval } = this.Store;
+		const { sequence, sequenceInterval } = this.store;
 		let i = null;
 
 		this.data.signals.onKeyDisable.dispatch();
@@ -116,14 +117,14 @@ export default class extends Phaser.State {
 	}
 
 	addNewKey() {
-		const key = this.game.rnd.integerInRange(1, this.Store.totalKeys);
+		const key = this.game.rnd.integerInRange(1, this.store.totalKeys);
 		this.data.signals.onNewKey.dispatch(key);
 
 		return this;
 	}
 
 	compareSequence() {
-		const { sequence, playerSequence } = this.Store;
+		const { sequence, playerSequence } = this.store;
 		const lastIndex = playerSequence.length - 1;
 
 		if (playerSequence[lastIndex] === sequence[lastIndex]) {
@@ -136,7 +137,7 @@ export default class extends Phaser.State {
 	}
 
 	handlePlayerSuccess() {
-		if (this.Store.sequence.length === this.Store.playerSequence.length) {
+		if (this.store.sequence.length === this.store.playerSequence.length) {
 			this.data.signals.onPlayerSuccess.dispatch();
 			this.data.signals.onKeyDisable.dispatch();
 			this.data.signals.onLevelUp.dispatch();
