@@ -24,6 +24,7 @@ export default class extends Phaser.State {
 	initData() {
 		this.data = {
 			signals: {
+				onPlayStateReady: this.onStateReady,
 				onNewKey: new Phaser.Signal(),
 				onNewPlayerKey: new Phaser.Signal(),
 				onKeyDisable: new Phaser.Signal(),
