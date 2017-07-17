@@ -15,6 +15,7 @@ class Store {
 		this.states = this.game.state.states;
 
 		this.score = 0;
+		this.secondsLasted = 0;
 		this.totalLives = 3;
 		this.totalKeys = 4;
 		this.keyColors = [0x421964, 0x18D5EE, 0xBA1D50, 0xB7A4CC];

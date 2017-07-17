@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import Plank from './Plank';
 import Life from './Life';
-import ScoreText from './ScoreText';
+import Score from './Score';
+import Timer from './/Timer';
 import { store } from '../store/';
 
 class UI {
@@ -16,14 +17,15 @@ class UI {
 		this.initData()
 				.initPlanks()
 				.initLives()
-				.initScoreText()
+				.initScore()
+				.initTimer()
 				.initSignals();
 	}
 
 	initData() {
 		this.data = {
 			padding: 20,
-			scoreTextTemplate: 'SCORE:',
+			ScoreTemplate: 'SCORE:',
 		};
 
 		return this;
@@ -109,11 +111,11 @@ class UI {
 		return this;
 	}
 
-	initScoreText() {
+	initScore() {
 		const options = {
 			x: this.game.width - this.data.padding,
 			y: this.bottomPlank.centerY,
-			text: `${this.data.scoreTextTemplate} ${this.store.score}`,
+			text: `${this.data.ScoreTemplate} ${this.store.score}`,
 			style: {
 				font: 'bold 20px Quicksand',
 				fill: 'white',
@@ -124,22 +126,49 @@ class UI {
 			},
 		};
 
-		this.scoreText = new ScoreText(this.game, options);
+		this.score = new Score(this.game, options);
+
+		return this;
+	}
+
+	initTimer() {
+		const options = {
+			x: this.game.world.centerX,
+			y: this.topPlank.centerY,
+			text: '00:00',
+			style: {
+				font: 'bold 20px Quicksand',
+				fill: 'white',
+			},
+			anchor: {
+				x: 0.5,
+				y: 0.5,
+			},
+		};
+
+		this.timer = new Timer(this.game, options);
 
 		return this;
 	}
 
 	initSignals() {
 		const { onLivesDecreased, onScoreIncreased } = this.store.getSignals();
+		const { onPlayStateReady } = this.game.state.states.Play.getSignals();
+
+		onPlayStateReady.add(this.startTimer, this);
 
 		onLivesDecreased.add(this.removeLife, this);
-		onScoreIncreased.add(this.updateScoreText, this);
+		onScoreIncreased.add(this.updateScore, this);
 
 		return this;
 	}
 
-	updateScoreText(score) {
-		this.scoreText.setText(`${this.data.scoreTextTemplate} ${score}`);
+	startTimer() {
+		this.timer.start();
+	}
+
+	updateScore(score) {
+		this.score.setText(`${this.data.ScoreTemplate} ${score}`);
 	}
 
 	removeLife() {
