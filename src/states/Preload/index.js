@@ -23,7 +23,7 @@ export default class extends Phaser.State {
 
 	loadAssets() {
 		const { paths } = config;
-		const { images, sounds } = settings;
+		const { images, spritesheets, sounds } = settings;
 
 		let i = null;
 		let key = null;
@@ -32,6 +32,14 @@ export default class extends Phaser.State {
 		for (i = 0; i < images.length; i += 1) {
 			key = images[i];
 			this.load.image(key, `${paths.images}${key}.png`);
+		}
+
+		// load spritesheets
+		for (i = 0; i < images.length; i += 1) {
+			const { framesCount, frameSize } = spritesheets[i];
+			key = spritesheets[i].key;
+
+			this.load.spritesheet(key, `${paths.spritesheets}${key}.png`, frameSize.w, frameSize.h, framesCount);
 		}
 
 		// loading sounds

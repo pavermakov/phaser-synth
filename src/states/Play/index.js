@@ -16,7 +16,7 @@ export default class extends Phaser.State {
 
 	create() {
 		this.synthKeys = this.createKeys();
-		this.UI = new UI(this.game);
+		this.UI = this.createUI();
 
 		this.start();
 	}
@@ -33,6 +33,7 @@ export default class extends Phaser.State {
 				onPlayerError: new Phaser.Signal(),
 				onPlayerSuccess: new Phaser.Signal(),
 				onLevelUp: new Phaser.Signal(),
+				onPauseStateChange: new Phaser.Signal(),
 			},
 		};
 
@@ -90,6 +91,15 @@ export default class extends Phaser.State {
 		onKeyTapped.add(this.processTap, this);
 
 		return this;
+	}
+
+	createUI() {
+		const ui = this.game.UI = new UI(this.game);
+		const { onPauseClick } = ui.getSignals();
+
+		onPauseClick.add(this.handlePauseClick, this);
+
+		return ui;
 	}
 
 	processTap(id) {
@@ -153,6 +163,10 @@ export default class extends Phaser.State {
 		utils.shakeCamera(this.game, 0.03, 200, true, Phaser.Camera.SHAKE_HORIZONTAL);
 
 		setTimeout(this.playSequence.bind(this), 1000);
+	}
+
+	handlePauseClick() {
+		this.data.signals.onPauseStateChange.dispatch();
 	}
 
 	getSignals() {
