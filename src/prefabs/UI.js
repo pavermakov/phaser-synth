@@ -2,7 +2,8 @@ import Phaser from 'phaser';
 import Plank from './Plank';
 import Life from './Life';
 import Score from './Score';
-import Timer from './/Timer';
+import Timer from './Timer';
+import PauseToggler from './PauseToggler';
 import { store } from '../store/';
 
 class UI {
@@ -15,17 +16,21 @@ class UI {
 
 	init() {
 		this.initData()
+				.initSignals()
 				.initPlanks()
+				.initPauseToggler()
 				.initLives()
 				.initScore()
-				.initTimer()
-				.initSignals();
+				.initTimer();
 	}
 
 	initData() {
 		this.data = {
 			padding: 20,
-			ScoreTemplate: 'SCORE:',
+			scoreTemplate: 'SCORE:',
+			signals: {
+				onPauseClick: new Phaser.Signal(),
+			},
 		};
 
 		return this;
@@ -77,6 +82,26 @@ class UI {
 		return this;
 	}
 
+	initPauseToggler() {
+		const options = {
+			x: this.game.world.width - this.data.padding,
+			y: this.topPlank.centerY - 3,
+			key: 'icons',
+			callback: this.handlePauseClick,
+			callbackContext: this,
+			frame: 2,
+			anchor: {
+				x: 1,
+				y: 0.5,
+			},
+			uiSignals: this.data.signals,
+		};
+
+		this.pauseToggler = new PauseToggler(this.game, options);
+
+		return this;
+	}
+
 	initLives() {
 		const { totalLives } = this.store;
 		const gap = 40;
@@ -115,7 +140,7 @@ class UI {
 		const options = {
 			x: this.game.width - this.data.padding,
 			y: this.bottomPlank.centerY,
-			text: `${this.data.ScoreTemplate} ${this.store.score}`,
+			text: `${this.data.scoreTemplate} ${this.store.score}`,
 			style: {
 				font: 'bold 20px Quicksand',
 				fill: 'white',
@@ -156,7 +181,6 @@ class UI {
 		const { onPlayStateReady } = this.game.state.states.Play.getSignals();
 
 		onPlayStateReady.add(this.startTimer, this);
-
 		onLivesDecreased.add(this.removeLife, this);
 		onScoreIncreased.add(this.updateScore, this);
 
@@ -168,13 +192,21 @@ class UI {
 	}
 
 	updateScore(score) {
-		this.score.setText(`${this.data.ScoreTemplate} ${score}`);
+		this.score.setText(`${this.data.scoreTemplate} ${score}`);
 	}
 
 	removeLife() {
 		if (this.lives.length <= 0) return;
 
 		this.lives.getAt(this.lives.length - 1).destroy();
+	}
+
+	handlePauseClick() {
+		this.data.signals.onPauseClick.dispatch();
+	}
+
+	getSignals() {
+		return this.data.signals;
 	}
 }
 

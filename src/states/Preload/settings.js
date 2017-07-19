@@ -8,6 +8,14 @@ const assets = {
 		'key-3',
 		'key-4',
 	],
+	spritesheets: [{
+		key: 'icons',
+		framesCount: 4,
+		frameSize: {
+			w: 40,
+			h: 40,
+		},
+	}],
 };
 
 export default assets;
