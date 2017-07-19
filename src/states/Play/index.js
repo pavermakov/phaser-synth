@@ -34,6 +34,7 @@ export default class extends Phaser.State {
 				onPlayerSuccess: new Phaser.Signal(),
 				onLevelUp: new Phaser.Signal(),
 				onPauseStateChange: new Phaser.Signal(),
+				onSoundStateChange: new Phaser.Signal(),
 			},
 		};
 
@@ -95,9 +96,10 @@ export default class extends Phaser.State {
 
 	createUI() {
 		const ui = this.game.UI = new UI(this.game);
-		const { onPauseClick } = ui.getSignals();
+		const { onPauseClick, onSoundClick } = ui.getSignals();
 
 		onPauseClick.add(this.handlePauseClick, this);
+		onSoundClick.add(this.handleSoundClick, this);
 
 		return ui;
 	}
@@ -167,6 +169,10 @@ export default class extends Phaser.State {
 
 	handlePauseClick() {
 		this.data.signals.onPauseStateChange.dispatch();
+	}
+
+	handleSoundClick() {
+		this.data.signals.onSoundStateChange.dispatch();
 	}
 
 	getSignals() {
