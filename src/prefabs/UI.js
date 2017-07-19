@@ -4,6 +4,7 @@ import Life from './Life';
 import Score from './Score';
 import Timer from './Timer';
 import PauseToggler from './PauseToggler';
+import SoundToggler from './SoundToggler';
 import { store } from '../store/';
 
 class UI {
@@ -18,6 +19,7 @@ class UI {
 		this.initData()
 				.initSignals()
 				.initPlanks()
+				.initSoundToggler()
 				.initPauseToggler()
 				.initLives()
 				.initScore()
@@ -27,9 +29,11 @@ class UI {
 	initData() {
 		this.data = {
 			padding: 20,
+			iconsMarginBottom: 3,
 			scoreTemplate: 'SCORE:',
 			signals: {
 				onPauseClick: new Phaser.Signal(),
+				onSoundClick: new Phaser.Signal(),
 			},
 		};
 
@@ -85,7 +89,7 @@ class UI {
 	initPauseToggler() {
 		const options = {
 			x: this.game.world.width - this.data.padding,
-			y: this.topPlank.centerY - 3,
+			y: this.topPlank.centerY - this.data.iconsMarginBottom,
 			key: 'icons',
 			callback: this.handlePauseClick,
 			callbackContext: this,
@@ -98,6 +102,26 @@ class UI {
 		};
 
 		this.pauseToggler = new PauseToggler(this.game, options);
+
+		return this;
+	}
+
+	initSoundToggler() {
+		const options = {
+			x: this.data.padding,
+			y: this.topPlank.centerY - this.data.iconsMarginBottom,
+			key: 'icons',
+			callback: this.handleSoundClick,
+			callbackContext: this,
+			frame: 0,
+			anchor: {
+				x: 0,
+				y: 0.5,
+			},
+			uiSignals: this.data.signals,
+		};
+
+		this.soundToggler = new SoundToggler(this.game, options);
 
 		return this;
 	}
@@ -203,6 +227,10 @@ class UI {
 
 	handlePauseClick() {
 		this.data.signals.onPauseClick.dispatch();
+	}
+
+	handleSoundClick() {
+		this.data.signals.onSoundClick.dispatch();
 	}
 
 	getSignals() {
