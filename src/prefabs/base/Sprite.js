@@ -1,10 +1,11 @@
 import Phaser from 'phaser';
 
 export default class extends Phaser.Sprite {
-	constructor(game, { x, y, key, frame, inputEnabled, anchor, scale }) {
+	constructor(game, { x, y, key, frame, inputEnabled, anchor, scale, alpha }) {
 		super(game, x, y, key, frame);
 
 		this.inputEnabled = inputEnabled || true;
+		this.alpha = alpha || 1;
 
 		if (anchor) {
 			this.anchor.setTo(anchor.x, anchor.y);
@@ -13,5 +14,13 @@ export default class extends Phaser.Sprite {
 		if (scale) {
 			this.scale.setTo(scale.x, scale.y);
 		}
+	}
+
+	hide() {
+		this.exists = false;
+	}
+
+	reveal() {
+		this.exists = true;
 	}
 }

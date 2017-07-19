@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import Plank from './Plank';
+import Rec from './Rec';
 import Life from './Life';
 import Score from './Score';
 import Timer from './Timer';
@@ -19,6 +20,7 @@ class UI {
 		this.initData()
 				.initSignals()
 				.initPlanks()
+				.initRec()
 				.initSoundToggler()
 				.initPauseToggler()
 				.initLives()
@@ -83,6 +85,22 @@ class UI {
 		this.bottomPlank = new Plank(this.game, options);
 		this.bottomPlank.bottom = this.game.height + this.separatorWidth;
 
+		return this;
+	}
+
+	initRec() {
+		const options = {
+			x: this.game.width,
+			y: this.bottomPlank.top,
+			key: 'rec',
+			anchor: {
+				x: 1,
+				y: 1,
+			},
+			alpha: 0,
+		};
+
+		this.rec = new Rec(this.game, options);
 		return this;
 	}
 
@@ -231,6 +249,14 @@ class UI {
 
 	handleSoundClick() {
 		this.data.signals.onSoundClick.dispatch();
+	}
+
+	toggleRec(isSequencePlaying) {
+		if (isSequencePlaying) {
+			this.rec.reveal();
+		} else {
+			this.rec.hide();
+		}
 	}
 
 	getSignals() {
