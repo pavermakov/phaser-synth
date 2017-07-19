@@ -35,7 +35,7 @@ export default class extends Phaser.State {
 		}
 
 		// load spritesheets
-		for (i = 0; i < images.length; i += 1) {
+		for (i = 0; i < spritesheets.length; i += 1) {
 			const { framesCount, frameSize } = spritesheets[i];
 			key = spritesheets[i].key;
 

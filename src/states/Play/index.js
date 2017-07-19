@@ -35,6 +35,8 @@ export default class extends Phaser.State {
 				onLevelUp: new Phaser.Signal(),
 				onPauseStateChange: new Phaser.Signal(),
 				onSoundStateChange: new Phaser.Signal(),
+				onSequenceStart: new Phaser.Signal(),
+				onSequenceStop: new Phaser.Signal(),
 			},
 		};
 
@@ -42,10 +44,11 @@ export default class extends Phaser.State {
 	}
 
 	initSignals() {
-		const { onNewKeyPushed, onNewPlayerKeyPushed } = this.store.getSignals();
+		const { onNewKeyPushed, onNewPlayerKeyPushed, onSequenceStateChange } = this.store.getSignals();
 
 		onNewKeyPushed.add(this.playSequence, this);
 		onNewPlayerKeyPushed.add(this.compareSequence, this);
+		onSequenceStateChange.add(this.handleSequenceStateChange, this);
 
 		return this;
 	}
@@ -113,6 +116,7 @@ export default class extends Phaser.State {
 		let i = null;
 
 		this.data.signals.onKeyDisable.dispatch();
+		this.data.signals.onSequenceStart.dispatch();
 
 		for (i = 0; i < sequence.length; i += 1) {
 			if (i < sequence.length) {
@@ -126,6 +130,7 @@ export default class extends Phaser.State {
 
 		if (i === sequence.length - 1) {
 			this.data.signals.onKeyEnable.dispatch();
+			setTimeout(() => { this.data.signals.onSequenceStop.dispatch(); }, 450);
 		}
 	}
 
@@ -173,6 +178,10 @@ export default class extends Phaser.State {
 
 	handleSoundClick() {
 		this.data.signals.onSoundStateChange.dispatch();
+	}
+
+	handleSequenceStateChange(isSequencePlaying) {
+		this.UI.toggleRec(isSequencePlaying);
 	}
 
 	getSignals() {

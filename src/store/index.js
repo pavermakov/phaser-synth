@@ -15,6 +15,7 @@ class Store {
 		this.states = this.game.state.states;
 		this.isGamePaused = false;
 		this.isGameMute = false;
+		this.isSequencePlaying = false;
 
 		this.score = 0;
 		this.secondsLasted = 0;
@@ -37,6 +38,7 @@ class Store {
 			onGameResume: new Phaser.Signal(),
 			onSoundOn: new Phaser.Signal(),
 			onSoundOff: new Phaser.Signal(),
+			onSequenceStateChange: new Phaser.Signal(),
 		};
 
 		return this;
@@ -57,6 +59,8 @@ class Store {
 			onLevelUp,
 			onPauseStateChange,
 			onSoundStateChange,
+			onSequenceStart,
+			onSequenceStop,
 		} = state.getSignals();
 
 		onNewKey.add(this.addKeyToSequence, this);
@@ -66,6 +70,8 @@ class Store {
 		onLevelUp.add(this.descreaseInterval, this);
 		onPauseStateChange.add(this.handlePauseStateChange, this);
 		onSoundStateChange.add(this.handleSoundStateChange, this);
+		onSequenceStart.add(this.handleSequenceStart, this);
+		onSequenceStop.add(this.handleSequenceStop, this);
 	}
 
 	handlePlayerSuccess() {
@@ -81,6 +87,16 @@ class Store {
 		} else {
 			this.signals.onOutOfLives.dispatch();
 		}
+	}
+
+	handleSequenceStart() {
+		this.isSequencePlaying = true;
+		this.signals.onSequenceStateChange.dispatch(this.isSequencePlaying);
+	}
+
+	handleSequenceStop() {
+		this.isSequencePlaying = false;
+		this.signals.onSequenceStateChange.dispatch(this.isSequencePlaying);
 	}
 
 	handlePauseStateChange() {
