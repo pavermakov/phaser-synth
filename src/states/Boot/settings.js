@@ -6,7 +6,7 @@ const settings = {
 	roundPixels: true,
 	forceSingleUpdate: false, // необходимо проверить на fps, и лишь потом сделать вывод
 	disableVisibilityChange: true,
-	scaleMode: Phaser.ScaleManager.SHOW_ALL,
+	scaleMode: Phaser.ScaleManager.RESIZE,
 	advancedTiming: true,
 };
 

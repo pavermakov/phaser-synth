@@ -3,8 +3,8 @@ import utils from '../utils/';
 
 const config = {
 	size: {
-		width: 320,
-		height: 568,
+		width: '100',
+		height: '100',
 	},
 	renderer: Phaser.CANVAS,
 	parent: 'content',
