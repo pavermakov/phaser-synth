@@ -7,15 +7,14 @@ import settings from './settings';
 export default class extends Phaser.State {
 	init() {
 		this.initData();
-		this._initSettings();
-		this._stretchCanvas();
+		this.initSettings();
 	}
 
 	preload() {
 		const { paths } = config;
 
 		this.load.image('loading', `${paths.images}loading.png`);
-		this.load.onLoadComplete.addOnce(this._finishAssets, this);
+		this.load.onLoadComplete.addOnce(this.finishAssets, this);
 	}
 
 	initData() {
@@ -23,7 +22,7 @@ export default class extends Phaser.State {
 		this.store = store.init();
 	}
 
-	_initSettings() {
+	initSettings() {
 		const game = this.game;
 		const paths = [
 			game,
@@ -44,39 +43,7 @@ export default class extends Phaser.State {
 		});
 	}
 
-	_stretchCanvas() {
-		const $content = jQuery('#content');
-		const $contentWidth = $content.width();
-		const $contentHeight = $content.height();
-		const isCanvasWider = $contentWidth > window.innerWidth;
-		const isCanvasTaller = $contentHeight > window.innerHeight;
-
-		let ratio;
-
-		if (isCanvasWider && !isCanvasTaller) {
-			ratio = window.innerWidth / $contentWidth;
-
-			$content.width(window.innerWidth);
-			$content.height(Math.ceil($contentHeight * ratio));
-		} else if (!isCanvasWider && isCanvasTaller) {
-			ratio = window.innerHeight / $contentHeight;
-
-			$content.width($content.width * ratio);
-			$content.height(window.innerHeight);
-		} else if ($contentHeight > $contentWidth) {
-			ratio = window.innerHeight / $contentHeight;
-
-			$content.width($content.width * ratio);
-			$content.height(window.innerHeight + 1);
-		} else if ($contentHeight < $contentWidth) {
-			ratio = window.innerWidth / $contentWidth;
-
-			$content.width($content.width * ratio);
-			$content.height(window.innerHeight);
-		}
-	}
-
-	_finishAssets() {
+	finishAssets() {
 		utils.switchState(this, 'Preload');
 	}
 }
