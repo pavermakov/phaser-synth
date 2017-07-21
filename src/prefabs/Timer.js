@@ -12,7 +12,8 @@ export default class extends Text {
 	init(game, options) {
 		this.game = game;
 
-		this.initData();
+		this.initData()
+				.initSignals(options);
 
 		this.game.add.existing(this);
 	}
@@ -22,11 +23,29 @@ export default class extends Text {
 			timer: this.game.time.create(false),
 			timerText: this.formatTime(store.secondsLasted),
 		};
+
+		return this;
+	}
+
+	initSignals({ uiSignals }) {
+		const { onPauseClick } = uiSignals;
+
+		onPauseClick.add(this.toggle, this);
+
+		return this;
 	}
 
 	start() {
 		this.data.timer.loop(1000, this.updateTimerText, this);
 		this.data.timer.start();
+	}
+
+	toggle() {
+		if (this.data.timer.paused) {
+			this.resume();
+		} else {
+			this.pause();
+		}
 	}
 
 	pause() {

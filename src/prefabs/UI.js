@@ -230,6 +230,7 @@ class UI {
 				x: 0.5,
 				y: 0.5,
 			},
+			uiSignals: this.data.signals,
 		};
 
 		this.timer = new Timer(this.game, options);

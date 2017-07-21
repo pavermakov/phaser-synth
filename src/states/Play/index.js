@@ -23,6 +23,8 @@ export default class extends Phaser.State {
 
 	initData() {
 		this.data = {
+			currentIndex: 0,
+			sequenceTimer: this.game.time.create(false),
 			signals: {
 				onPlayStateReady: this.onStateReady,
 				onNewKey: new Phaser.Signal(),
@@ -44,11 +46,18 @@ export default class extends Phaser.State {
 	}
 
 	initSignals() {
-		const { onNewKeyPushed, onNewPlayerKeyPushed, onSequenceStateChange } = this.store.getSignals();
+		const {
+			onNewKeyPushed,
+			onNewPlayerKeyPushed,
+			onSequenceStateChange,
+			onGamePause,
+			onGameResume } = this.store.getSignals();
 
 		onNewKeyPushed.add(this.playSequence, this);
 		onNewPlayerKeyPushed.add(this.compareSequence, this);
 		onSequenceStateChange.add(this.handleSequenceStateChange, this);
+		onGamePause.add(this.handleGamePause, this);
+		onGameResume.add(this.handleGameResume, this);
 
 		return this;
 	}
@@ -113,24 +122,27 @@ export default class extends Phaser.State {
 
 	playSequence() {
 		const { sequence, sequenceInterval } = this.store;
-		let i = null;
 
 		this.data.signals.onKeyDisable.dispatch();
 		this.data.signals.onSequenceStart.dispatch();
 
-		for (i = 0; i < sequence.length; i += 1) {
-			if (i < sequence.length) {
-				setTimeout(this.activateSynthKey.bind(this, sequence, i), sequenceInterval * i);
-			}
-		}
+		this.data.sequenceTimer.repeat(sequenceInterval, sequence.length, this.activateSynthKey, this);
+		this.data.sequenceTimer.start();
 	}
 
-	activateSynthKey(sequence, i) {
-		this.data.signals.onKeyActive.dispatch(sequence[i], true);
+	activateSynthKey() {
+		const { sequence } = this.store;
+		const { currentIndex } = this.data;
 
-		if (i === sequence.length - 1) {
+		this.data.signals.onKeyActive.dispatch(sequence[currentIndex], true);
+
+		if (currentIndex === sequence.length - 1) {
 			this.data.signals.onKeyEnable.dispatch();
-			setTimeout(() => { this.data.signals.onSequenceStop.dispatch(); }, 450);
+			this.data.currentIndex = 0;
+
+			setTimeout(() => { this.data.signals.onSequenceStop.dispatch(); }, 350);
+		} else {
+			this.data.currentIndex += 1;
 		}
 	}
 
@@ -182,6 +194,22 @@ export default class extends Phaser.State {
 
 	handleSequenceStateChange(isSequencePlaying) {
 		this.UI.toggleRec(isSequencePlaying);
+	}
+
+	handleGamePause() {
+		this.pauseSequence();
+	}
+
+	handleGameResume() {
+		this.resumeSequence();
+	}
+
+	pauseSequence() {
+		this.data.sequenceTimer.pause();
+	}
+
+	resumeSequence() {
+		this.data.sequenceTimer.resume();
 	}
 
 	getSignals() {
