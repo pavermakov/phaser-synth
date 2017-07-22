@@ -166,13 +166,49 @@ export default class extends Phaser.State {
 		return this;
 	}
 
+	nextLevel() {
+		const { score } = this.store;
+
+		if (score % 3 === 0) {
+			this.switchSpots();
+		} else {
+			this.addNewKey();
+		}
+	}
+
+	switchSpots() {
+		const availableKeys = utils.shuffle([1, 2, 3, 4]); // TODO: refactor to match the value from the store
+		const target = this.synthKeys[availableKeys.pop() - 1];
+		const destination = this.synthKeys[availableKeys.shift() - 1];
+		const duration = 350;
+		const easing = Phaser.Easing.Cubic.InOut;
+		const temp = {};
+
+		const targetUp = this.game.add.tween(target);
+		const targetDown = this.game.add.tween(target);
+		const destinationUp = this.game.add.tween(destination);
+		const destinationDown = this.game.add.tween(destination);
+
+		temp.x = target.x;
+		targetUp.to({ y: -this.game.height }, duration, easing, true).onComplete.add(() => target.x = destination.x, this);
+		destinationDown.to({ y: this.game.height }, duration, easing, true).onComplete.add(() => destination.x = temp.x, this);
+
+		targetDown.to({ y: 0 }, duration, easing, false);
+		destinationUp.to({ y: 0 }, duration, easing, false);
+
+		targetUp.chain(targetDown);
+		destinationDown.chain(destinationUp);
+
+		destinationUp.onComplete.add(this.addNewKey.bind(this));
+	}
+
 	handlePlayerSuccess() {
 		if (this.store.sequence.length === this.store.playerSequence.length) {
 			this.data.signals.onPlayerSuccess.dispatch();
 			this.data.signals.onKeyDisable.dispatch();
 			this.data.signals.onLevelUp.dispatch();
 
-			setTimeout(this.addNewKey.bind(this), 1000);
+			setTimeout(this.nextLevel.bind(this), 1000);
 		}
 	}
 

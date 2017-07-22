@@ -100,6 +100,7 @@ class UI {
 				y: 1,
 			},
 			alpha: 0,
+			exists: false,
 		};
 
 		this.rec = new Rec(this.game, options);
