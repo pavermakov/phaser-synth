@@ -1,11 +1,13 @@
 import Phaser from 'phaser';
 import WebFont from 'webfontloader';
+import { store } from '../../store/';
 import config from '../../config/';
 import settings from './settings';
 import utils from '../../utils/';
 
 export default class extends Phaser.State {
 	init() {
+		this.store = store;
 		this.fontsReady = false;
 		this.assetsReady = false;
 		this.apiReady = false;
@@ -106,7 +108,9 @@ export default class extends Phaser.State {
 	}
 
 	completeLoading() {
+		const { cameraShiftColor, cameraShiftDuration } = this.store;
+
 		this.removePreloadBar();
-		utils.switchState(this, 'Play');
+		utils.fadeCamera(this, cameraShiftColor, cameraShiftDuration, utils.switchState.bind(this, this, 'Play'));
 	}
 }
