@@ -18,7 +18,7 @@ export default class extends Phaser.State {
 		this.synthKeys = this.createKeys();
 		this.UI = this.createUI();
 
-		this.start();
+		utils.revealCamera(this, this.store.cameraShiftColor, this.store.cameraShiftDuration, this.start);
 	}
 
 	initData() {

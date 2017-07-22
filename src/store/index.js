@@ -22,6 +22,8 @@ class Store {
 		this.totalLives = 3;
 		this.totalKeys = 4;
 		this.keyColors = [0x421964, 0x18D5EE, 0xBA1D50, 0xB7A4CC];
+		this.cameraShiftDuration = 250;
+		this.cameraShiftColor = 0x0F0909;
 
 		this.sequence = [];
 		this.playerSequence = [];
