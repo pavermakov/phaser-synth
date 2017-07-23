@@ -15,8 +15,4 @@ export default class extends Phaser.Text {
 			this.scale.setTo(scale.x, scale.y);
 		}
 	}
-
-	setText(newText) {
-		super.setText(newText);
-	}
 }
