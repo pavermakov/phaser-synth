@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import Plank from './Plank';
 import Rec from './Rec';
-import Overlay from './Overlay';
+import PauseScreen from './PauseScreen';
 import Life from './Life';
 import Score from './Score';
 import Timer from './Timer';
@@ -22,7 +22,7 @@ class UI {
 				.initSignals()
 				.initPlanks()
 				.initRec()
-				.initOverlay()
+				.initPauseScreen()
 				.initSoundToggler()
 				.initPauseToggler()
 				.initLives()
@@ -107,7 +107,7 @@ class UI {
 		return this;
 	}
 
-	initOverlay() {
+	initPauseScreen() {
 		const bmd = this.game.add.bitmapData(this.game.world.width, this.game.world.height);
 		bmd.fill(0, 0, 0, 0.95);
 
@@ -118,8 +118,8 @@ class UI {
 			uiSignals: this.data.signals,
 		};
 
-		this.overlay = new Overlay(this.game, options);
-		this.overlay.hide();
+		this.PauseScreen = new PauseScreen(this.game, options);
+		this.PauseScreen.hide();
 
 		return this;
 	}
