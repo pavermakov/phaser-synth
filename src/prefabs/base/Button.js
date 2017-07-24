@@ -14,4 +14,12 @@ export default class extends Phaser.Button {
 			this.scale.setTo(scale.x, scale.y);
 		}
 	}
+
+	hide() {
+		this.exists = false;
+	}
+
+	reveal() {
+		this.exists = true;
+	}
 }

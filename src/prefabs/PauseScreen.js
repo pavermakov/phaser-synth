@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import Text from './base/Text';
 import Sprite from './base/Sprite';
+import { store } from '../store/';
 
 export default class extends Sprite {
 	constructor(game, options) {
@@ -11,6 +12,7 @@ export default class extends Sprite {
 
 	init(game, options) {
 		this.game = game;
+		this.store = store;
 
 		this.initData()
 				.initSignals(options);
@@ -59,6 +61,8 @@ export default class extends Sprite {
 	}
 
 	toggle() {
+		if (this.store.isGameOver) return;
+
 		if (this.exists) {
 			this.data.text.exists = false;
 			this.hide();

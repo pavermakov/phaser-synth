@@ -15,6 +15,7 @@ class Store {
 		this.states = this.game.state.states;
 		this.isGamePaused = false;
 		this.isGameMute = false;
+		this.isGameOver = false;
 		this.isSequencePlaying = false;
 
 		this.score = 0;
@@ -84,9 +85,10 @@ class Store {
 	handlePlayerError() {
 		this.clearPlayerSequence();
 
-		if (this.totalLives > 0) {
+		if (this.totalLives > 1) {
 			this.descreaseLives();
 		} else {
+			this.isGameOver = true;
 			this.signals.onOutOfLives.dispatch();
 		}
 	}
@@ -147,6 +149,20 @@ class Store {
 
 	clearPlayerSequence() {
 		this.playerSequence.length = 0;
+	}
+
+	reset() {
+		this.isGamePaused = false;
+		this.isGameMute = false;
+		this.isGameOver = false;
+		this.isSequencePlaying = false;
+
+		this.score = 0;
+		this.secondsLasted = 0;
+		this.totalLives = 3;
+
+		this.sequence = [];
+		this.playerSequence = [];
 	}
 
 	getSignals() {

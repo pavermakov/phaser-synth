@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import Plank from './Plank';
 import Rec from './Rec';
 import PauseScreen from './PauseScreen';
+import GameOverScreen from './GameOverScreen';
 import Life from './Life';
 import Score from './Score';
 import Timer from './Timer';
@@ -23,6 +24,7 @@ class UI {
 				.initPlanks()
 				.initRec()
 				.initPauseScreen()
+				.initGameOverScreen()
 				.initSoundToggler()
 				.initPauseToggler()
 				.initLives()
@@ -38,6 +40,8 @@ class UI {
 			signals: {
 				onPauseClick: new Phaser.Signal(),
 				onSoundClick: new Phaser.Signal(),
+				onGameRestart: new Phaser.Signal(),
+				onGameOver: new Phaser.Signal(),
 			},
 		};
 
@@ -124,6 +128,27 @@ class UI {
 		return this;
 	}
 
+	// TODO: refactor; PauseScreen and GameOverScreens are very similary, should be a way to reuse them
+	initGameOverScreen() {
+		const bmd = this.game.add.bitmapData(this.game.world.width, this.game.world.height);
+		bmd.fill(0, 0, 0, 0.95);
+
+		const options = {
+			x: 0,
+			y: 0,
+			key: bmd,
+			uiSignals: this.data.signals,
+		};
+
+		this.GameOverScreen = new GameOverScreen(this.game, options);
+		this.GameOverScreen.hide();
+
+		const { onGameRestart } = this.GameOverScreen.getSignals();
+		onGameRestart.add(this.fireRestartEvent, this);
+
+		return this;
+	}
+
 	initPauseToggler() {
 		const options = {
 			x: this.game.world.width - this.data.padding,
@@ -170,7 +195,8 @@ class UI {
 		let life = null;
 		let i = null;
 
-		this.lives = this.game.add.group();
+		this.lives = this.lives || this.game.add.group();
+		this.lives.removeAll(true);
 
 		const options = {
 			id: null,
@@ -240,12 +266,13 @@ class UI {
 	}
 
 	initSignals() {
-		const { onLivesDecreased, onScoreIncreased } = this.store.getSignals();
+		const { onLivesDecreased, onScoreIncreased, onOutOfLives } = this.store.getSignals();
 		const { onPlayStateReady } = this.game.state.states.Play.getSignals();
 
 		onPlayStateReady.add(this.startTimer, this);
 		onLivesDecreased.add(this.removeLife, this);
 		onScoreIncreased.add(this.updateScore, this);
+		onOutOfLives.add(this.handleOutOfLives, this);
 
 		return this;
 	}
@@ -272,12 +299,37 @@ class UI {
 		this.data.signals.onSoundClick.dispatch();
 	}
 
+	handleOutOfLives() {
+		this.data.signals.onGameOver.dispatch();
+
+		this.timer.pause();
+		this.pauseToggler.hide();
+	}
+
+	fireRestartEvent() {
+		this.data.signals.onGameRestart.dispatch();
+	}
+
 	toggleRec(isSequencePlaying) {
+		if (this.store.isGameOver) return;
+
 		if (isSequencePlaying) {
 			this.rec.reveal();
 		} else {
 			this.rec.hide();
 		}
+	}
+
+	pause() {
+		this.timer.pause();
+	}
+
+	reset() {
+		this.pauseToggler.reveal();
+		this.initLives();
+
+		this.timer.reset();
+		this.timer.start();
 	}
 
 	getSignals() {

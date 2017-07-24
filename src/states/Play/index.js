@@ -7,7 +7,7 @@ import utils from '../../utils/';
 export default class extends Phaser.State {
 	init() {
 		this.store = store;
-		this.game = this.store.game;
+		this.game = window.game;
 		this.world = this.game.world;
 
 		this.initData();
@@ -108,10 +108,11 @@ export default class extends Phaser.State {
 
 	createUI() {
 		const ui = this.game.UI = new UI(this.game);
-		const { onPauseClick, onSoundClick } = ui.getSignals();
+		const { onPauseClick, onSoundClick, onGameRestart } = ui.getSignals();
 
 		onPauseClick.add(this.handlePauseClick, this);
 		onSoundClick.add(this.handleSoundClick, this);
+		onGameRestart.add(this.restart, this);
 
 		return ui;
 	}
@@ -246,6 +247,12 @@ export default class extends Phaser.State {
 
 	resumeSequence() {
 		this.data.sequenceTimer.resume();
+	}
+
+	restart() {
+		// TODO: refactor, wtf?
+		this.store.reset();
+		this.UI.reset();
 	}
 
 	getSignals() {

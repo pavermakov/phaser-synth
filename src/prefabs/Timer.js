@@ -11,6 +11,7 @@ export default class extends Text {
 
 	init(game, options) {
 		this.game = game;
+		this.store = store;
 
 		this.initData()
 				.initSignals(options);
@@ -24,6 +25,8 @@ export default class extends Text {
 			timerText: this.formatTime(store.secondsLasted),
 		};
 
+		this.data.timer.loop(1000, this.updateTimerText, this);
+
 		return this;
 	}
 
@@ -36,7 +39,7 @@ export default class extends Text {
 	}
 
 	start() {
-		this.data.timer.loop(1000, this.updateTimerText, this);
+
 		this.data.timer.start();
 	}
 
@@ -54,6 +57,10 @@ export default class extends Text {
 
 	resume() {
 		this.data.timer.resume();
+	}
+
+	reset() {
+		this.data.timer.stop();
 	}
 
 	updateTimerText() {

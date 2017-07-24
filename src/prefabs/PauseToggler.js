@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import Button from './base/Button';
+import { store } from '../store/';
 
 export default class extends Button {
 	constructor(game, options) {
@@ -10,6 +11,7 @@ export default class extends Button {
 
 	init(game, options) {
 		this.game = game;
+		this.store = store;
 
 		this.initSignals(options);
 
